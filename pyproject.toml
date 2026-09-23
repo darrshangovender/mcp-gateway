@@ -1,0 +1,55 @@
+[project]
+name = "mcp-gateway"
+version = "0.1.0"
+description = "A hardened MCP server framework — tenant isolation, per-tool auth and guardrails, rate limiting and audit logging around the tools you expose to LLM clients."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Darrshan Govender", email = "darrshangovender@gmail.com" }]
+keywords = ["mcp", "model-context-protocol", "llm", "security", "multi-tenant", "guardrails", "json-rpc"]
+
+# Two runtime dependencies. pydantic validates every message on the wire;
+# starlette is the HTTP/SSE transport. The MCP protocol itself is implemented
+# here over JSON-RPC 2.0 rather than pulled from the official SDK, so it can be
+# inspected and tested offline. Redis and OpenTelemetry are optional extras
+# that the code lazy-imports and degrades without.
+dependencies = [
+    "pydantic>=2.7",
+    "starlette>=0.37",
+]
+
+[project.optional-dependencies]
+redis = ["redis>=5.0"]
+otel = ["opentelemetry-api>=1.25"]
+server = ["uvicorn>=0.30"]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.1",
+    "ruff>=0.6",
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://github.com/darrshangovender/mcp-gateway"
+Issues = "https://github.com/darrshangovender/mcp-gateway/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Stated explicitly: the distribution name is hyphenated while the import
+# package is underscored, and relying on hatchling's guess has broken builds
+# elsewhere in this portfolio.
+[tool.hatch.build.targets.wheel]
+packages = ["mcp_gateway"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
